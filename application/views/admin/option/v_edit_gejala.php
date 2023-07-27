@@ -7,7 +7,7 @@
                     <div class="panel-heading">Edit Data Gejala</div>
                         <div class="panel-body">
                             <div class="form">
-                            <form class="form-validate form-horizontal" method="post" action="<?php echo site_url('a_gejala/edit')?>">
+                            <form class="form-validate form-horizontal" method="post" action="<?php echo site_url('a_gejala/edit')?>" enctype="multipart/form-data">
                                 <div class="form-group">
                                 <label for="kd_penyakit" class="control-label col-lg-2">Kode Gejala</label>
                                     <div class="col-lg-10">
@@ -23,9 +23,14 @@
                                 <div class="form-group">
                                     <label for="gambar_gejala" class="control-label col-lg-2">Gambar Gejala</label>
                                     <div class="col-lg-10">
+                                        <!-- Tampilkan gambar jika sudah ada -->
+                                        <?php if ($baris['gambar'] !== null && $baris['gambar'] !== ''): ?>
+                                            <img src="<?php echo base_url('assets/img/gejala/' . $baris['gambar']); ?>" style="max-width: 200px;">
+                                        <?php endif; ?>
                                         <input class="form-control" name="gambar_gejala" type="file" accept="image/*"/>
                                     </div>
                                 </div>
+
                                 <div class="form-group">
                                 <label for="nama_penyakit" class="control-label col-lg-2">Bobot Pakar Gejala</label>
                                     <div class="col-lg-10">

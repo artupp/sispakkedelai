@@ -28,27 +28,63 @@ class A_gejala extends CI_Controller {
 	
 	//    ======================== EDIT =======================
     
-	function edit()
+	public function edit()
 	{
-        if(isset($_POST['submit']))
-		{
-			// proses edit
-			$id		    =   $this->input->post('kd_gejala');
-			$gejala   =   $this->input->post('nama_gejala');
-			$bobot   =   $this->input->post('bobot_pakar');
-			
-			$data		=	array('nama_gejala'=>$gejala,'bobot_pakar'=>$bobot);
-			$this->model_master->updateGejala($data,$id);
+		if (isset($_POST['submit'])) {
+			// Proses edit data gejala
+			$id = $this->input->post('kd_gejala');
+			$gejala = $this->input->post('nama_gejala');
+			$bobot = $this->input->post('bobot_pakar');
+
+			$data = array(
+				'nama_gejala' => $gejala,
+				'bobot_pakar' => $bobot,
+			);
+
+			// Upload gambar baru jika ada yang diunggah
+			if (!empty($_FILES['gambar_gejala']['name'])) {
+				$this->load->library('upload');
+
+				$config['upload_path'] = './assets/img/gejala/';
+				$config['allowed_types'] = 'gif|jpg|png';
+				$config['max_size'] = 2048;
+
+				$this->upload->initialize($config);
+
+				if ($this->upload->do_upload('gambar_gejala')) {
+					$upload_data = $this->upload->data();
+
+					// Hapus gambar lama jika ada
+					$gambar_lama = $this->model_master->getGejalaById($id)->row_array()['gambar'];
+					if ($gambar_lama && file_exists('./assets/img/gejala/' . $gambar_lama)) {
+						unlink('./assets/img/gejala/' . $gambar_lama);
+					}
+
+					// Ubah nama file menjadi kode gejala
+					$new_file_name = $id . '.' . pathinfo($upload_data['file_name'], PATHINFO_EXTENSION); // Buat nama baru
+					$new_file_path = $config['upload_path'] . $new_file_name; // Path file gambar baru
+					rename($upload_data['full_path'], $new_file_path); // Ubah nama file
+
+					$data['gambar'] = $new_file_name;
+				} else {
+					// Tindakan yang sesuai jika terjadi kesalahan saat mengunggah gambar
+					// Misalnya, tampilkan pesan kesalahan atau berikan nilai default untuk gambar
+					$error = $this->upload->display_errors();
+					// ...
+				}
+			}
+
+			$this->model_master->updateGejala($data, $id);
 			redirect('a_gejala');
-        }
-		else
-		{ 
-            $id = $this->uri->segment(3);
-            $data['baris'] = $this->model_master->getGejalaById($id)->row_array();
-			$this->load->view('admin/v_header',$data);
-			$this->load->view('admin/option/v_edit_gejala',$data);
-        }		
-    }
+		} else {
+			// Tampilkan form edit data gejala
+			$id = $this->uri->segment(3);
+			$data['baris'] = $this->model_master->getGejalaById($id)->row_array();
+			$this->load->view('admin/v_header', $data);
+			$this->load->view('admin/option/v_edit_gejala', $data);
+		}
+	}
+
 	
 	//    ======================== INSERT =======================
 	
@@ -94,10 +130,18 @@ class A_gejala extends CI_Controller {
 	
 	
 	//    ======================== DELETE =======================
-    function hapusGejala(){
-        $id = $this->uri->segment(3);
-        $this->model_master->deleteGejala($id);
-        redirect("a_gejala");
-    }
+    public function hapusGejala()
+	{
+		$id = $this->uri->segment(3);
+
+		// Hapus gambar terkait jika ada
+		$gambar_lama = $this->model_master->getGejalaById($id)->row_array()['gambar'];
+		if ($gambar_lama && file_exists('./assets/img/gejala/' . $gambar_lama)) {
+			unlink('./assets/img/gejala/' . $gambar_lama);
+		}
+
+		$this->model_master->deleteGejala($id);
+		redirect("a_gejala");
+	}
 }
 ?>

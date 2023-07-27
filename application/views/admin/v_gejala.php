@@ -32,7 +32,7 @@
                                     <td><?php echo $no++; ?></td>
                                     <td><?php echo $row->kd_gejala; ?></td>
                                     <td><?php echo $row->nama_gejala; ?></td>
-                                    <td><img src="<?php echo base_url('assets/img/gejala/' . $row->gambar); ?>" ></td>
+                                    <td><img src="<?php echo base_url('assets/img/gejala/' . $row->gambar); ?>" style="max-width: 200px;" ></td>
                                     <td><?php echo $row->bobot_pakar; ?></td>
                                     <td>
                                         <a class="icon-edit" href="<?php echo site_url('a_gejala/edit/' . $row->kd_gejala); ?>"></a>
