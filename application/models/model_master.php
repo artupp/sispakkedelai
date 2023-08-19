@@ -3,6 +3,10 @@ class Model_master extends CI_Model
 {
 
     //  GET DATA
+    function getAllDepot()
+    {
+        return $this->db->query("select * from tbl_depot")->result();
+    }
 
     function getAllPengguna()
     {
